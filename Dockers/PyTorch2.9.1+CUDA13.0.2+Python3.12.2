@@ -48,16 +48,17 @@ RUN cd /root && \
 ENV PATH="/root/miniconda3/bin:/usr/local/bin:${PATH}"
 
 # ---------- Python / Jupyter setup ----------
-# Install JupyterLab, widgets, zh_CN pack, matplotlib, h5py via pip
-# ipympl via conda for full compatibility
-RUN pip install --no-cache-dir --upgrade pip && \
-    pip install --no-cache-dir \
+RUN conda config --remove-key channels || true && \
+    conda config --add channels conda-forge && \
+    conda config --set channel_priority strict && \
+    pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir --root-user-action=ignore \
         "jupyterlab>=4.0.0" \
         ipywidgets \
         matplotlib \
         h5py \
         jupyterlab_language_pack_zh_CN && \
-    conda install -y -c conda-forge ipympl && \
+    conda install -y ipympl && \
     conda clean -afy
 
 # ---------- PyTorch (CUDA 13.0) ----------
