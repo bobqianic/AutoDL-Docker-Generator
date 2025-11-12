@@ -61,5 +61,8 @@ RUN pip install --no-cache-dir --upgrade pip && \
     conda clean -afy
 
 # ---------- PyTorch (CUDA 12.9) ----------
-RUN pip install --no-cache-dir --index-url https://download.pytorch.org/whl/cu129 \
-        torch torchvision
+RUN pip install --no-cache-dir \
+    torch==2.8.0 \
+    torchvision==0.23.0 \
+    torchaudio==2.8.0 \
+    --index-url https://download.pytorch.org/whl/cu129
