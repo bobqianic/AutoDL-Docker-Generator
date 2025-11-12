@@ -58,8 +58,9 @@ RUN conda config --remove-key channels || true && \
         matplotlib \
         h5py \
         jupyterlab_language_pack_zh_CN && \
-    conda install -y ipympl && \
+    conda install -y -c conda-forge --override-channels ipympl && \
     conda clean -afy
+
 
 # ---------- PyTorch (CUDA 13.0) ----------
 RUN pip install --no-cache-dir \
