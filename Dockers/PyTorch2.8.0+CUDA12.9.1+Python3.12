@@ -37,15 +37,25 @@ RUN locale-gen en_GB en_GB.UTF-8 && \
     ln -sf /usr/share/zoneinfo/Europe/London /etc/localtime && \
     echo 'Europe/London' > /etc/timezone
 
-# ---------- Install Miniconda (Python 3.12.2) ----------
-RUN cd /root && \
-    wget -q https://repo.anaconda.com/miniconda/Miniconda3-py312_24.9.2-0-Linux-x86_64.sh && \
-    bash ./Miniconda3-py312_24.9.2-0-Linux-x86_64.sh -b -f -p /root/miniconda3 && \
-    rm -f ./Miniconda3-py312_24.9.2-0-Linux-x86_64.sh && \
-    echo "PATH=/root/miniconda3/bin:/usr/local/bin:\$PATH" >> /etc/profile && \
-    echo "source /etc/profile" >> /root/.bashrc && \
-    echo "source /etc/autodl-motd" >> /root/.bashrc
-ENV PATH="/root/miniconda3/bin:/usr/local/bin:${PATH}"
+# ---------- Install Miniforge (conda-forge only) ----------
+ENV CONDA_DIR=/opt/conda
+ENV PATH=$CONDA_DIR/bin:$PATH
+
+ARG MINIFORGE_VERSION=25.3.1-0
+RUN curl -fsSL -o /tmp/miniforge.sh \
+      https://github.com/conda-forge/miniforge/releases/download/${MINIFORGE_VERSION}/Miniforge3-Linux-x86_64.sh \
+ && bash /tmp/miniforge.sh -b -p $CONDA_DIR \
+ && rm /tmp/miniforge.sh \
+ && conda config --add channels conda-forge \
+ && conda config --set channel_priority strict \
+ && conda config --set auto_activate_base false \
+ && conda clean -afy
+
+# Create env from conda-forge only
+RUN conda create -y -n py312 python=3.12 \
+ && conda clean -afy
+
+ENV PATH=$CONDA_DIR/envs/py312/bin:$PATH
 
 # ---------- Python / Jupyter setup ----------
 # Install JupyterLab, widgets, zh_CN pack, matplotlib, h5py via pip
